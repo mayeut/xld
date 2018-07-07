@@ -871,6 +871,10 @@ fail:
 				else cur_frame_size = nb_samples;
 			}
 #endif
+			if(bufferSize < cur_frame_size) {
+				bufferSize = cur_frame_size;
+				input = realloc(input, format.channels*bufferSize);
+			}
 			for(i=nb_samples*format.channels;i<cur_frame_size*format.channels;i++) input[pos+i]=0;
 		}
 		

@@ -62,16 +62,16 @@
 		[o_bitrate setEnabled:NO];
 		[o_createCorrectionFile setEnabled:NO];
 		[o_dns setEnabled:NO];
-		[o_text1 setTextColor:[NSColor grayColor]];
-		[o_text2 setTextColor:[NSColor grayColor]];
+		[o_text1 setTextColor:[NSColor disabledControlTextColor]];
+		[o_text2 setTextColor:[NSColor disabledControlTextColor]];
 		[o_text3 setStringValue:[bundle localizedStringForKey:@"Compresion Ratio" value:nil table:nil]];
 	}
 	else {
 		[o_bitrate setEnabled:YES];
 		[o_createCorrectionFile setEnabled:YES];
 		[o_dns setEnabled:YES];
-		[o_text1 setTextColor:[NSColor blackColor]];
-		[o_text2 setTextColor:[NSColor blackColor]];
+		[o_text1 setTextColor:[NSColor controlTextColor]];
+		[o_text2 setTextColor:[NSColor controlTextColor]];
 		[o_text3 setStringValue:[bundle localizedStringForKey:@"Quality" value:nil table:nil]];
 	}
 }
@@ -80,13 +80,13 @@
 {
 	if([o_extraCompression state] == NSOnState) {
 		[o_extraValue setEnabled:YES];
-		[o_text4 setTextColor:[NSColor blackColor]];
-		[o_text5 setTextColor:[NSColor blackColor]];
+		[o_text4 setTextColor:[NSColor controlTextColor]];
+		[o_text5 setTextColor:[NSColor controlTextColor]];
 	}
 	else {
 		[o_extraValue setEnabled:NO];
-		[o_text4 setTextColor:[NSColor grayColor]];
-		[o_text5 setTextColor:[NSColor grayColor]];
+		[o_text4 setTextColor:[NSColor disabledControlTextColor]];
+		[o_text5 setTextColor:[NSColor disabledControlTextColor]];
 	}
 }
 

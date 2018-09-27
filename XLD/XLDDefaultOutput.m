@@ -74,11 +74,11 @@
 	}
 	if([[o_samplerate selectedItem] tag]) {
 		[o_srcAlgorithm setEnabled:YES];
-		[o_text4 setTextColor:[NSColor blackColor]];
+		[o_text4 setTextColor:[NSColor controlTextColor]];
 	}
 	else {
 		[o_srcAlgorithm setEnabled:NO];
-		[o_text4 setTextColor:[NSColor lightGrayColor]];
+		[o_text4 setTextColor:[NSColor disabledControlTextColor]];
 	}
 }
 

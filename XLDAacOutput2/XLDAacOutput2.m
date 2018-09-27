@@ -141,23 +141,23 @@ APPKIT_EXTERN const double NSAppKitVersionNumber;
 	if([o_encodeMode indexOfSelectedItem] < 3) {
 		[o_bitrateField setEnabled:YES];
 		[o_vbrQuality setEnabled:NO];
-		[o_field01 setTextColor:[NSColor blackColor]];
-		[o_field02 setTextColor:[NSColor blackColor]];
-		[o_field11 setTextColor:[NSColor grayColor]];
-		[o_field12 setTextColor:[NSColor grayColor]];
-		//[o_field13 setTextColor:[NSColor grayColor]];
-		//[o_field14 setTextColor:[NSColor grayColor]];
+		[o_field01 setTextColor:[NSColor controlTextColor]];
+		[o_field02 setTextColor:[NSColor controlTextColor]];
+		[o_field11 setTextColor:[NSColor disabledControlTextColor]];
+		[o_field12 setTextColor:[NSColor disabledControlTextColor]];
+		//[o_field13 setTextColor:[NSColor disabledControlTextColor]];
+		//[o_field14 setTextColor:[NSColor disabledControlTextColor]];
 		if(isSBRAvailable) [o_enableHE setEnabled:YES];
 	}
 	else {
 		[o_bitrateField setEnabled:NO];
 		[o_vbrQuality setEnabled:YES];
-		[o_field01 setTextColor:[NSColor grayColor]];
-		[o_field02 setTextColor:[NSColor grayColor]];
-		[o_field11 setTextColor:[NSColor blackColor]];
-		[o_field12 setTextColor:[NSColor blackColor]];
-		//[o_field13 setTextColor:[NSColor blackColor]];
-		//[o_field14 setTextColor:[NSColor blackColor]];
+		[o_field01 setTextColor:[NSColor disabledControlTextColor]];
+		[o_field02 setTextColor:[NSColor disabledControlTextColor]];
+		[o_field11 setTextColor:[NSColor controlTextColor]];
+		[o_field12 setTextColor:[NSColor controlTextColor]];
+		//[o_field13 setTextColor:[NSColor controlTextColor]];
+		//[o_field14 setTextColor:[NSColor controlTextColor]];
 		[o_enableHE setState:NSOffState];
 		[o_enableHE setEnabled:NO];
 	}

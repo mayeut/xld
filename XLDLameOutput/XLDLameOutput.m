@@ -168,22 +168,22 @@
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:NO];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor lightGrayColor]];
-				[o_abrBitrate setTextColor:[NSColor blackColor]];
+					[subview setTextColor:[NSColor disabledControlTextColor]];
+				[o_abrBitrate setTextColor:[NSColor controlTextColor]];
 			}
 			for(i=0;i<[[cbrBox subviews] count];i++) {
 				id subview = [[cbrBox subviews] objectAtIndex:i];
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:NO];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor lightGrayColor]];
+					[subview setTextColor:[NSColor disabledControlTextColor]];
 			}
 			for(i=0;i<[[vbrBox subviews] count];i++) {
 				id subview = [[vbrBox subviews] objectAtIndex:i];
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:YES];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor blackColor]];
+					[subview setTextColor:[NSColor controlTextColor]];
 			}
 			break;
 		case 1:
@@ -192,21 +192,21 @@
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:YES];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor blackColor]];
+					[subview setTextColor:[NSColor controlTextColor]];
 			}
 			for(i=0;i<[[cbrBox subviews] count];i++) {
 				id subview = [[cbrBox subviews] objectAtIndex:i];
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:NO];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor lightGrayColor]];
+					[subview setTextColor:[NSColor disabledControlTextColor]];
 			}
 			for(i=0;i<[[vbrBox subviews] count];i++) {
 				id subview = [[vbrBox subviews] objectAtIndex:i];
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:NO];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor lightGrayColor]];
+					[subview setTextColor:[NSColor disabledControlTextColor]];
 			}
 			break;
 		case 2:
@@ -215,22 +215,22 @@
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:NO];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor lightGrayColor]];
-				[o_abrBitrate setTextColor:[NSColor blackColor]];
+					[subview setTextColor:[NSColor disabledControlTextColor]];
+				[o_abrBitrate setTextColor:[NSColor controlTextColor]];
 			}
 			for(i=0;i<[[cbrBox subviews] count];i++) {
 				id subview = [[cbrBox subviews] objectAtIndex:i];
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:YES];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor blackColor]];
+					[subview setTextColor:[NSColor controlTextColor]];
 			}
 			for(i=0;i<[[vbrBox subviews] count];i++) {
 				id subview = [[vbrBox subviews] objectAtIndex:i];
 				if([subview respondsToSelector:@selector(setEnabled:)])
 					[subview setEnabled:NO];
 				if([subview respondsToSelector:@selector(setTextColor:)])
-					[subview setTextColor:[NSColor lightGrayColor]];
+					[subview setTextColor:[NSColor disabledControlTextColor]];
 			}
 			break;
 	}

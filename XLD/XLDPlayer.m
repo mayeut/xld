@@ -710,29 +710,29 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 	/*if(![o_playerWindow isVisible]) */[o_playerWindow makeKeyAndOrderFront:self];
 }
 
-static void updateStatus(XLDPlayer *player)
+- (void)updateStatus
 {
-	if(player->currentIndex != [player->currentTrack count] - 1 && player->currentFrame >= [(XLDTrack *)[player->currentTrack objectAtIndex:player->currentIndex+1] index]) {
-		player->currentIndex = player->currentIndex+1;
-		player->second = 0;
-		[player setTrackNameOfIndex:player->currentIndex];
-		[player setSecond:player->second];
+	if(currentIndex != [currentTrack count] - 1 && currentFrame >= [(XLDTrack *)[currentTrack objectAtIndex:currentIndex+1] index]) {
+		currentIndex = currentIndex+1;
+		second = 0;
+		[self setTrackNameOfIndex:currentIndex];
+		[self setSecond:second];
 	}
-	double sec = (double)(player->currentFrame - [(XLDTrack *)[player->currentTrack objectAtIndex:player->currentIndex] index])/player->samplerate;
-	if(sec >= player->second + 0.5) {
-		[player setSecond:sec];
-		player->second = sec;
+	double sec = (double)(currentFrame - [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index])/samplerate;
+	if(sec >= second + 0.5) {
+		[self setSecond:sec];
+		second = sec;
 		xldoffset_t framesToPlay;
-		if(player->currentIndex == [player->currentTrack count] - 1) { //last track
-			framesToPlay = player->totalFrame - [(XLDTrack *)[player->currentTrack objectAtIndex:player->currentIndex] index];
+		if(currentIndex == [currentTrack count] - 1) { //last track
+			framesToPlay = totalFrame - [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index];
 		}
 		else {
-			framesToPlay = [[player->currentTrack objectAtIndex:player->currentIndex] frames];
+			framesToPlay = [[currentTrack objectAtIndex:currentIndex] frames];
 		}
-		double percentage = (double)(player->currentFrame - [(XLDTrack *)[player->currentTrack objectAtIndex:player->currentIndex] index]) / framesToPlay * 100.0;
-		//if(percentage != player->percentage) {
-			//player->percentage = percentage;
-			if(![player->o_positionSlider mouseDownFlag]) [player->o_positionSlider setDoubleValue:percentage];
+		double progress = (double)(currentFrame - [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index]) / framesToPlay * 100.0;
+		//if(percentage != progress) {
+		//percentage = progress;
+		if(![o_positionSlider mouseDownFlag]) [o_positionSlider setDoubleValue:progress];
 		//}
 	}
 }
@@ -781,7 +781,7 @@ static OSStatus MyACComplexInputProc   (AudioConverterRef                       
 	ioData->mBuffers[0].mData = dest;
 	
 	player->currentFrame += *ioNumberDataPackets;
-	updateStatus(player);
+	[player performSelectorOnMainThread:@selector(updateStatus) withObject:nil waitUntilDone:NO];
 	
 	[pool release];
 	return noErr;

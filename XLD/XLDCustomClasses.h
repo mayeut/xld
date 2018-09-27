@@ -135,6 +135,7 @@
 #else
 @interface NSBundle (XLDLSUIElement)
 - (NSDictionary *)mod_infoDictionary;
+- (NSDictionary *)mod_infoDictionary2;
 @end
 #endif
 

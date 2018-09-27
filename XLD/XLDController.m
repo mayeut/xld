@@ -45,6 +45,7 @@
 #import "XLDOpticalDriveManager.h"
 
 #define NSAppKitVersionNumber10_5 949
+extern int XLDDarkModeSupportEnabled;
 
 static NSString*    GeneralIdentifier = @"General";
 static NSString*    BatchIdentifier = @"Batch";
@@ -1374,22 +1375,22 @@ static void getFilesFromM3U(NSString *m3u, NSMutableArray *queue, NSStringEncodi
 		[o_scalePixel setEnabled:YES];
 		[o_compressionQuality setEnabled:YES];
 		[o_expandImage setEnabled:YES];
-		[o_textGroup_1_1 setTextColor:[NSColor blackColor]];
-		[o_textGroup_1_2 setTextColor:[NSColor blackColor]];
-		[o_textGroup_1_3 setTextColor:[NSColor blackColor]];
-		[o_textGroup_1_4 setTextColor:[NSColor blackColor]];
-		[o_textGroup_1_5 setTextColor:[NSColor blackColor]];
+		[o_textGroup_1_1 setTextColor:[NSColor controlTextColor]];
+		[o_textGroup_1_2 setTextColor:[NSColor controlTextColor]];
+		[o_textGroup_1_3 setTextColor:[NSColor controlTextColor]];
+		[o_textGroup_1_4 setTextColor:[NSColor controlTextColor]];
+		[o_textGroup_1_5 setTextColor:[NSColor controlTextColor]];
 	}
 	else {
 		[o_scaleType setEnabled:NO];
 		[o_scalePixel setEnabled:NO];
 		[o_compressionQuality setEnabled:NO];
 		[o_expandImage setEnabled:NO];
-		[o_textGroup_1_1 setTextColor:[NSColor grayColor]];
-		[o_textGroup_1_2 setTextColor:[NSColor grayColor]];
-		[o_textGroup_1_3 setTextColor:[NSColor grayColor]];
-		[o_textGroup_1_4 setTextColor:[NSColor grayColor]];
-		[o_textGroup_1_5 setTextColor:[NSColor grayColor]];
+		[o_textGroup_1_1 setTextColor:[NSColor disabledControlTextColor]];
+		[o_textGroup_1_2 setTextColor:[NSColor disabledControlTextColor]];
+		[o_textGroup_1_3 setTextColor:[NSColor disabledControlTextColor]];
+		[o_textGroup_1_4 setTextColor:[NSColor disabledControlTextColor]];
+		[o_textGroup_1_5 setTextColor:[NSColor disabledControlTextColor]];
 	}
 	
 	if([[o_filenameFormatRadio selectedCell] tag] == 0) {
@@ -1856,6 +1857,26 @@ end:
 	[opticalDriveManager ejectDisc:[NSString stringWithUTF8String:statDisc.f_mntfromname]];
 }
 
+- (IBAction)toggleDarkModeSupport:(id)sender
+{
+	NSUserDefaults *pref = [NSUserDefaults standardUserDefaults];
+	BOOL darkModeEnabled = [pref boolForKey:@"DarkModeSupport"];
+	if(!darkModeEnabled) {
+		[pref setBool:YES forKey:@"DarkModeSupport"];
+		[sender setState:NSOnState];
+	} else {
+		[pref setBool:NO forKey:@"DarkModeSupport"];
+		[sender setState:NSOffState];
+	}
+	[pref synchronize];
+	if(darkModeEnabled == XLDDarkModeSupportEnabled) {
+		if(!XLDDarkModeSupportEnabled)
+			NSRunAlertPanel(LS(@"Enable Dark Mode Support"), LS(@"Please restart XLD to take effect. Experimental - may cause grapical glitches."), @"OK", nil, nil);
+		else
+			NSRunAlertPanel(LS(@"Disable Dark Mode Support"), LS(@"Please restart XLD to take effect."), @"OK", nil, nil);
+	}
+}
+
 #pragma mark Normal Methods
 
 - (id)init
@@ -2148,7 +2169,7 @@ end:
 	if(obj=[pref objectForKey:@"CuesheetEncodings2"]) {
 		int i;
 		for(i=[o_cuesheetEncodings numberOfItems]-1;i>=0;i--) {
-			if([[o_cuesheetEncodings itemAtIndex:i] tag] == [obj intValue]) {
+			if((int)[[o_cuesheetEncodings itemAtIndex:i] tag] == [obj intValue]) {
 				[o_cuesheetEncodings selectItemAtIndex:i];
 				break;
 			}
@@ -3488,7 +3509,9 @@ end:
 		 */
 	}
 	[out appendString:@"End of status report\n"];
-	[[[o_logView textStorage] mutableString] setString:out];
+	NSDictionary *attributes = [NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName];
+	NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:out attributes:attributes];
+	[[o_logView textStorage] setAttributedString:attributedString];
 	[[o_logView textStorage] setFont:[NSFont fontWithName:@"Monaco" size:10]];
 	[o_logWindow makeKeyAndOrderFront:self];
 	
@@ -3997,7 +4020,9 @@ end:
 
 - (void)showLogStr:(NSString *)logStr
 {
-	[[[o_logView textStorage] mutableString] setString:logStr];
+	NSDictionary *attributes = [NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName];
+	NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:logStr attributes:attributes];
+	[[o_logView textStorage] setAttributedString:attributedString];
 	[[o_logView textStorage] setFont:[NSFont fontWithName:@"Monaco" size:10]];
 	[o_logView scrollRangeToVisible: NSMakeRange(0,0)];
 	[o_logWindow makeKeyAndOrderFront:self];
@@ -4621,6 +4646,12 @@ fail:
 	toolbar = [[[NSToolbar alloc] initWithIdentifier:@"LogToolbar"] autorelease];
     [toolbar setDelegate:self];
     [o_logWindow setToolbar:toolbar];
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+	if(XLDDarkModeSupportEnabled) {
+		[[o_logView superview] setWantsLayer:YES];
+		[[o_defaultCommentValue superview] setWantsLayer:YES];
+	}
+#endif
 	
 	[o_defaultCommentValue setFont:[NSFont systemFontOfSize:11]]; 
 	[o_formatList setAutoenablesItems:NO];
@@ -4661,7 +4692,15 @@ fail:
 		[[[[NSApp mainMenu] itemAtIndex:0] submenu] insertItem:DSDImporterItem atIndex:5];
 		[DSDImporterItem release];
 	}
-	
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+	if(floor(NSAppKitVersionNumber) > 1561) {
+		NSMenuItem *enableDarkModeItem = [[NSMenuItem alloc] initWithTitle:LS(@"Enable Dark Mode Support") action:@selector(toggleDarkModeSupport:) keyEquivalent:@""];
+		if([defs boolForKey:@"DarkModeSupport"]) [enableDarkModeItem setState:NSOnState];
+		[enableDarkModeItem setTarget:self];
+		[[[[NSApp mainMenu] itemAtIndex:0] submenu] insertItem:enableDarkModeItem atIndex:5];
+		[enableDarkModeItem release];
+	}
+#endif
 	[self performSelector:@selector(launchOK) withObject:nil afterDelay:0.5];
 	/*if(queuedFile) {
 	 [self application:NSApp openFile:queuedFile];

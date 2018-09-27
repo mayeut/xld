@@ -20,6 +20,7 @@
 #import "XLDMultipleFileWrappedDecoder.h"
 
 #define NSAppKitVersionNumber10_4 824
+extern int XLDDarkModeSupportEnabled;
 
 static NSString *framesToMSFStr(xldoffset_t frames, int samplerate)
 {
@@ -170,6 +171,13 @@ static NSString *framesToMSFStr(xldoffset_t frames, int samplerate)
 	[[o_window contentView] addSubview:hiddenButton];
 	[hiddenButton release];
 	
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+	if(XLDDarkModeSupportEnabled) {
+		[[[o_trackTable superview] superview] setWantsLayer:YES];
+		[[[o_selectorTable superview] superview] setWantsLayer:YES];
+	}
+	[o_splitView setDividerStyle:NSSplitViewDividerStyleThin];
+#endif
 	[o_window display];
 	//[o_window makeKeyAndOrderFront:self];
 	proposedRow = -1;

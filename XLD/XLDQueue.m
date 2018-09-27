@@ -10,6 +10,8 @@
 #import "XLDConverterTask.h"
 #import "XLDCDDAResult.h"
 
+extern int XLDDarkModeSupportEnabled;
+
 @implementation XLDQueue
 
 - (id)init
@@ -34,6 +36,11 @@
 	[o_mainPanel setToolbar:theBar];
 	[theBar release];
 	selectedRow = -1;
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+	if(XLDDarkModeSupportEnabled) {
+		[[o_tableView superview] setWantsLayer:YES];
+	}
+#endif
 	return self;
 }
 

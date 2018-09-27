@@ -16,6 +16,8 @@
 #import "XLDCueParser.h"
 #import "XLDDiscView.h"
 
+extern int XLDDarkModeSupportEnabled;
+
 static const char* ID3v1GenreList[] = {
     "Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk",
     "Grunge", "Hip-Hop", "Jazz", "Metal", "New Age", "Oldies",
@@ -120,6 +122,11 @@ static const char* ID3v1GenreList[] = {
 	
 	[o_textParserText setFont:[NSFont systemFontOfSize:12]];
 	[o_textParserMatching setAutoenablesItems:NO];
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+	if(XLDDarkModeSupportEnabled) {
+		[[o_textParserText superview] setWantsLayer:YES];
+	}
+#endif
 	return self;
 }
 

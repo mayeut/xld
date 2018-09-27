@@ -593,23 +593,22 @@ static NSString *framesToMSFStr(xldoffset_t frames, int samplerate)
 
 @implementation XLDSplitView
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-- (CGFloat)dividerThickness
+/*- (CGFloat)dividerThickness
 {
 	return 1.0;
-}
+}*/
 #else
 - (float)dividerThickness
 {
 	return 1.0f;
 }
-#endif
 
 - (void)drawDividerInRect:(NSRect)rect
 {
-    [[NSColor grayColor] set];
-    NSRectFill(rect);
+	[[NSColor grayColor] set];
+	NSRectFill(rect);
 }
-
+#endif
 @end
 
 @implementation XLDAdaptiveTexturedWindow
@@ -723,6 +722,12 @@ static NSString *framesToMSFStr(xldoffset_t frames, int samplerate)
 {
 	id dic = [self mod_infoDictionary];
 	if([dic respondsToSelector:@selector(setBool:forKey:)]) [dic setBool:YES forKey:@"LSUIElement"];
+	return dic;
+}
+- (NSDictionary *)mod_infoDictionary2
+{
+	id dic = [self mod_infoDictionary2];
+	if([dic respondsToSelector:@selector(setBool:forKey:)]) [dic setBool:NO forKey:@"NSRequiresAquaSystemAppearance"];
 	return dic;
 }
 @end

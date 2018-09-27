@@ -727,7 +727,7 @@ typedef struct {
 			[statusField setStringValue:LS(@"Error: cannot write the output file")];
 			[statusField setHidden:NO];
 			//[self hideProgress];
-			[queue convertFinished:self];
+			[queue performSelectorOnMainThread:@selector(convertFinished:) withObject:self waitUntilDone:NO];
 			return;
 		}
 	}
@@ -1426,7 +1426,7 @@ finish:
 
 - (void)taskDeselected
 {
-	[nameField setTextColor:[NSColor blackColor]];
+	[nameField setTextColor:[NSColor controlTextColor]];
 }
 
 - (cddaRipResult *)cddaRipResult

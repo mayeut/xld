@@ -93,21 +93,21 @@
 	if([o_addTags state] == NSOnState) {
 		[o_tagFormat setEnabled:YES];
 		[o_tagEncoding setEnabled:YES];
-		[o_text1 setTextColor:[NSColor blackColor]];
-		[o_text2 setTextColor:[NSColor blackColor]];
-		[o_text3 setTextColor:[NSColor blackColor]];
+		[o_text1 setTextColor:[NSColor controlTextColor]];
+		[o_text2 setTextColor:[NSColor controlTextColor]];
+		[o_text3 setTextColor:[NSColor controlTextColor]];
 		if([[o_tagFormat selectedCell] tag] == 1) {
 			[o_tagEncoding setEnabled:NO];
-			[o_text2 setTextColor:[NSColor lightGrayColor]];
-			[o_text3 setTextColor:[NSColor lightGrayColor]];
+			[o_text2 setTextColor:[NSColor disabledControlTextColor]];
+			[o_text3 setTextColor:[NSColor disabledControlTextColor]];
 		}
 	}
 	else {
 		[o_tagFormat setEnabled:NO];
 		[o_tagEncoding setEnabled:NO];
-		[o_text1 setTextColor:[NSColor lightGrayColor]];
-		[o_text2 setTextColor:[NSColor lightGrayColor]];
-		[o_text3 setTextColor:[NSColor lightGrayColor]];
+		[o_text1 setTextColor:[NSColor disabledControlTextColor]];
+		[o_text2 setTextColor:[NSColor disabledControlTextColor]];
+		[o_text3 setTextColor:[NSColor disabledControlTextColor]];
 	}
 }
 

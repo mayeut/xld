@@ -13,6 +13,7 @@
 #endif
 
 extern int cmdline_main(int argc, char *argv[]);
+int XLDDarkModeSupportEnabled;
 
 int main(int argc, char *argv[])
 {
@@ -26,5 +27,17 @@ int main(int argc, char *argv[])
 #endif
 		return cmdline_main(argc,argv);
 	}
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+	if(floor(NSAppKitVersionNumber) > 1561) {
+		NSUserDefaults *pref = [NSUserDefaults standardUserDefaults];
+		BOOL darkModeEnabled = [pref boolForKey:@"DarkModeSupport"];
+		if(darkModeEnabled) {
+			Method fromMethod = class_getInstanceMethod([NSBundle class],@selector(infoDictionary));
+			Method toMethod   = class_getInstanceMethod([NSBundle class],@selector(mod_infoDictionary2));
+			method_exchangeImplementations(fromMethod, toMethod);
+			XLDDarkModeSupportEnabled = 1;
+		}
+	}
+#endif
     return NSApplicationMain(argc,  (const char **) argv);
 }

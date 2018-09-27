@@ -8,6 +8,7 @@
 
 #import "XLDRenamer.h"
 #define NSAppKitVersionNumber10_4 824
+extern int XLDDarkModeSupportEnabled;
 
 @implementation XLDRenamer
 
@@ -87,6 +88,11 @@
 
 - (void)loadPrefs
 {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+	if(XLDDarkModeSupportEnabled) {
+		[[[o_renameList superview] superview] setWantsLayer:YES];
+	}
+#endif
 	NSUserDefaults *pref = [NSUserDefaults standardUserDefaults];
 	[self loadConfigurations:pref];
 }

@@ -20,6 +20,7 @@
 								   [NSNumber numberWithInt:0], @"XLDDSDDecoderQuantization",
 								   [NSNumber numberWithInt:0], @"XLDDSDDecoderGain",nil];
 	[[NSUserDefaultsController sharedUserDefaultsController] setInitialValues:defaultValues];
+	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	[NSBundle loadNibNamed:@"XLDDSDDecoder" owner:self];
 	[self statusChanged:nil];
 	return self;
@@ -34,11 +35,11 @@
 {
 	if([[o_samplerate selectedItem] tag] > 0) {
 		[o_srcAlgorithm setEnabled:YES];
-		[o_text1 setTextColor:[NSColor blackColor]];
+		[o_text1 setTextColor:[NSColor controlTextColor]];
 	}
 	else {
 		[o_srcAlgorithm setEnabled:NO];
-		[o_text1 setTextColor:[NSColor lightGrayColor]];
+		[o_text1 setTextColor:[NSColor disabledControlTextColor]];
 	}
 }
 

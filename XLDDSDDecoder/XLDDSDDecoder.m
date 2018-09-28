@@ -786,6 +786,7 @@ fail:
 
 - (void)loadConfigurations:(NSDictionary *)cfg
 {
+	if(configurations) [configurations release];
 	configurations = [cfg retain];
 }
 

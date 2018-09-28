@@ -94,7 +94,7 @@ static NSString *framesToMSFStr(xldoffset_t frames, int samplerate)
 	item = [[NSToolbarItem alloc] initWithItemIdentifier:@"GetMetadata"];
 	[item setLabel:LS(@"Get Metadata")];
 	[item setPaletteLabel:LS(@"Get Metadata")];
-	[item setImage:[NSImage imageNamed:@"cddb"]];
+	[item setImage:[[NSWorkspace sharedWorkspace] iconForNetwork]];
 	[item setTarget:delegate];
 	[item setAction:@selector(cddbGetTracks:)];
 	[toolbarItems setObject:item forKey:@"GetMetadata"];

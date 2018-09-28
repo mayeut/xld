@@ -4799,7 +4799,7 @@ willBeInsertedIntoToolbar:(BOOL)willBeInserted
 		
 		if ([itemId isEqualToString:GeneralIdentifier]) {
 			[toolbarItem setLabel:LS(@"General")];
-			[toolbarItem setImage:[NSImage imageNamed:@"general"]];
+			[toolbarItem setImage:[[NSWorkspace sharedWorkspace] iconForGeneral]];
 			
 			return toolbarItem;
 		}
@@ -4817,7 +4817,7 @@ willBeInsertedIntoToolbar:(BOOL)willBeInserted
 		}
 		else if ([itemId isEqualToString:CDDBIdentifier]) {
 			[toolbarItem setLabel:LS(@"CDDB")];
-			[toolbarItem setImage:[NSImage imageNamed:@"cddb"]];
+			[toolbarItem setImage:[[NSWorkspace sharedWorkspace] iconForNetwork]];
 			
 			return toolbarItem;
 		}

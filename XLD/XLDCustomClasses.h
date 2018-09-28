@@ -94,6 +94,8 @@
 - (NSImage *)iconForFolder;
 - (NSImage *)iconForDisc;
 - (NSImage *)iconForBurn;
+- (NSImage *)iconForNetwork;
+- (NSImage *)iconForGeneral;
 @end
 
 @interface NSData (FasterSynchronusDownload)

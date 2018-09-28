@@ -643,6 +643,18 @@ static NSString *framesToMSFStr(xldoffset_t frames, int samplerate)
 {
 	return [self iconForFileType:NSFileTypeForHFSTypeCode(kBurningIcon)];
 }
+
+- (NSImage *)iconForNetwork
+{
+	return [self iconForFileType:NSFileTypeForHFSTypeCode(kGenericNetworkIcon)];
+}
+
+- (NSImage *)iconForGeneral
+{
+	NSImage *icon = [[NSImage alloc] initWithContentsOfFile:@"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/General.icns"];
+	if(icon) return [icon autorelease];
+	return [NSImage imageNamed:@"general"];
+}
 @end
 
 @implementation NSData (FasterSynchronusDownload)

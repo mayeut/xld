@@ -320,6 +320,7 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 {
 	if(!playing) return;
 	[lock lock];
+	requestingStop = YES;
 	if(pause) {
 		[o_playButton setImage:[NSImage imageNamed:@"pause_active"]];
 		[o_playButton setAlternateImage:[NSImage imageNamed:@"pause_blue"]];
@@ -334,6 +335,7 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 	[self setTrackNameOfIndex:currentIndex];
 	[self setSecond:0];
 	seekpoint = [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index];
+	requestingStop = NO;
 	[lock unlock];
 }
 
@@ -341,6 +343,7 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 {
 	if(!playing) return;
 	[lock lock];
+	requestingStop = YES;
 	if(pause) {
 		[o_playButton setImage:[NSImage imageNamed:@"pause_active"]];
 		[o_playButton setAlternateImage:[NSImage imageNamed:@"pause_blue"]];
@@ -355,6 +358,7 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 	[self setTrackNameOfIndex:currentIndex];
 	[self setSecond:0];
 	seekpoint = [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index];
+	requestingStop = NO;
 	[lock unlock];
 }
 
@@ -362,6 +366,7 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 {
 	if(!playing) return;
 	[lock lock];
+	requestingStop = YES;
 	if(!pause) {
 		[self fadeout];
 		AudioOutputUnitStop(outputUnit);
@@ -377,6 +382,7 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 	second = [sender doubleValue]*framesToPlay/100/samplerate;
 	[self setSecond:second];
 	seekpoint = [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index] + [sender doubleValue]*framesToPlay/100;
+	requestingStop = NO;
 	[lock unlock];
 	[o_positionSlider setMouseDownFlag:NO];
     [o_positionSlider setEnabled:NO];
@@ -661,6 +667,7 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 - (void)stop
 {
 	if(!playing) return;
+	requestingStop = YES;
 	[self fadeout];
 	playing = NO;
 	pause = NO;
@@ -685,6 +692,7 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 	[o_currentTrack setStringValue:@""];
 	[o_positionSlider setEnabled:NO];
 	[o_secondStr setStringValue:@""];
+	requestingStop = NO;
 }
 
 - (void)seekToFrame:(xldoffset_t)frame
@@ -710,30 +718,36 @@ static OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags    *
 	/*if(![o_playerWindow isVisible]) */[o_playerWindow makeKeyAndOrderFront:self];
 }
 
-- (void)updateStatus
+- (void)updateDisplayStatusWithCurrentTime
 {
-	if(currentIndex != [currentTrack count] - 1 && currentFrame >= [(XLDTrack *)[currentTrack objectAtIndex:currentIndex+1] index]) {
-		currentIndex = currentIndex+1;
-		second = 0;
-		[self setTrackNameOfIndex:currentIndex];
-		[self setSecond:second];
+	if(requestingStop) return;
+	if(second == 0) [self setTrackNameOfIndex:currentIndex];
+	[self setSecond:second];
+	xldoffset_t framesToPlay;
+	if(currentIndex == [currentTrack count] - 1) { //last track
+		framesToPlay = totalFrame - [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index];
 	}
-	double sec = (double)(currentFrame - [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index])/samplerate;
-	if(sec >= second + 0.5) {
-		[self setSecond:sec];
-		second = sec;
-		xldoffset_t framesToPlay;
-		if(currentIndex == [currentTrack count] - 1) { //last track
-			framesToPlay = totalFrame - [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index];
-		}
-		else {
-			framesToPlay = [[currentTrack objectAtIndex:currentIndex] frames];
-		}
-		double progress = (double)(currentFrame - [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index]) / framesToPlay * 100.0;
-		//if(percentage != progress) {
+	else {
+		framesToPlay = [[currentTrack objectAtIndex:currentIndex] frames];
+	}
+	double progress = (double)(currentFrame - [(XLDTrack *)[currentTrack objectAtIndex:currentIndex] index]) / framesToPlay * 100.0;
+	//if(percentage != progress) {
 		//percentage = progress;
 		if(![o_positionSlider mouseDownFlag]) [o_positionSlider setDoubleValue:progress];
-		//}
+	//}
+}
+
+static void updateStatus(XLDPlayer *player)
+{
+	if(player->currentIndex != [player->currentTrack count] - 1 && player->currentFrame >= [(XLDTrack *)[player->currentTrack objectAtIndex:player->currentIndex+1] index]) {
+		player->currentIndex = player->currentIndex+1;
+		player->second = 0;
+		[player performSelectorOnMainThread:@selector(updateDisplayStatusWithCurrentTime) withObject:nil waitUntilDone:NO];
+	}
+	double sec = (double)(player->currentFrame - [(XLDTrack *)[player->currentTrack objectAtIndex:player->currentIndex] index])/player->samplerate;
+	if(sec >= player->second + 0.5) {
+		player->second = sec;
+		[player performSelectorOnMainThread:@selector(updateDisplayStatusWithCurrentTime) withObject:nil waitUntilDone:NO];
 	}
 }
 
@@ -781,7 +795,7 @@ static OSStatus MyACComplexInputProc   (AudioConverterRef                       
 	ioData->mBuffers[0].mData = dest;
 	
 	player->currentFrame += *ioNumberDataPackets;
-	[player performSelectorOnMainThread:@selector(updateStatus) withObject:nil waitUntilDone:NO];
+	if(!player->requestingStop) updateStatus(player);
 	
 	[pool release];
 	return noErr;

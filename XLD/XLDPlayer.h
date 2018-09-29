@@ -46,6 +46,7 @@
 	BOOL lastBuffer;
 	BOOL decodeFinished;
 	BOOL playDone;
+	BOOL requestingStop;
 	
 	unsigned char *buffer;
 	int bufferSize;

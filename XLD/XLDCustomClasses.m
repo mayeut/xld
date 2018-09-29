@@ -114,7 +114,7 @@ static NSString *framesToMSFStr(xldoffset_t frames, int samplerate)
     NSRect targetImageFrame = NSMakeRect(0,0,170,170);
     NSImage *targetImage = [[NSImage alloc] initWithSize:targetImageFrame.size];
     [targetImage lockFocus];
-    [[NSColor whiteColor] set];
+    [[NSColor controlLightHighlightColor] set];
     NSRectFill(targetImageFrame);
     [img compositeToPoint:NSMakePoint((170-[img size].width)/2,(170-[img size].height)/2-5) operation:NSCompositeSourceOver];
     [targetImage unlockFocus];

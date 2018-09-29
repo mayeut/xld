@@ -31,6 +31,15 @@ int main(int argc, char *argv[])
 	if(floor(NSAppKitVersionNumber) > 1561) {
 		NSUserDefaults *pref = [NSUserDefaults standardUserDefaults];
 		BOOL darkModeEnabled = [pref boolForKey:@"DarkModeSupport"];
+		id modeSpecifiedByLocalPlist = [pref objectForKey:@"NSRequiresAquaSystemAppearance"];
+		if(modeSpecifiedByLocalPlist) {
+			if([modeSpecifiedByLocalPlist boolValue] == NO) {
+				/* force enabled by local preference .plist */
+				[pref setBool:YES forKey:@"DarkModeSupport"];
+				darkModeEnabled = YES;
+			}
+			[pref removeObjectForKey:@"NSRequiresAquaSystemAppearance"];
+		}
 		if(darkModeEnabled) {
 			Method fromMethod = class_getInstanceMethod([NSBundle class],@selector(infoDictionary));
 			Method toMethod   = class_getInstanceMethod([NSBundle class],@selector(mod_infoDictionary2));

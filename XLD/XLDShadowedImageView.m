@@ -41,16 +41,16 @@
 		rect.origin.y += 5;
 		rect.size.width -= 10;
 		rect.size.height -= 10;
-		[[NSColor whiteColor] set];
+		[[NSColor controlLightHighlightColor] set];
 		NSRectFill(rect);
 		[NSGraphicsContext restoreGraphicsState];
 		
 		NSImage *imgStr = [NSImage imageWithString:defaultString?defaultString:@"No Image" withFont:[NSFont boldSystemFontOfSize:30] withColor:[NSColor lightGrayColor]];
 		NSRect origRect = NSMakeRect(0, 0, [imgStr size].width, [imgStr size].height);
 		NSRect newRect;
-		newRect.size.width = viewWidth-20;
-		newRect.size.height = [imgStr size].height*(viewHeight-20)/[imgStr size].width;
-		newRect.origin.x = 10;
+		newRect.size.width = viewWidth-10;
+		newRect.size.height = [imgStr size].height*(viewHeight-10)/[imgStr size].width;
+		newRect.origin.x = 5;
 		newRect.origin.y = (viewHeight-newRect.size.height)*0.5;
 		[imgStr drawInRect:newRect fromRect:origRect operation:NSCompositeSourceOver fraction:1.0];
 		[borderColor set];

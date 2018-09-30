@@ -1,5 +1,5 @@
 
-# define FloatToUnsigned(f)	((unsigned long)(((long)((f) - 2147483648.0)) + 2147483647L + 1))
+# define FloatToUnsigned(f)	((unsigned int)(((int)((f) - 2147483648.0)) + 2147483647 + 1))
 
 #import <Foundation/Foundation.h>
 #import <objc/objc-runtime.h>
@@ -39,7 +39,7 @@ static void ConvertToIeeeExtended(double num, char* bytes)
 	int    sign;
 	int expon;
 	double fMant, fsMant;
-	unsigned long hiMant, loMant;
+	unsigned int hiMant, loMant;
 	
 	if (num < 0) {
 		sign = 0x8000;
@@ -1025,7 +1025,7 @@ int cmdline_main(int argc, char *argv[])
 						fprintf(stderr,">");
 					else fprintf(stderr,"-");
 				}
-				fprintf(stderr,"| %3d%% (Track %d/%d)",percent,track+1,[trackList count]);
+				fprintf(stderr,"| %3d%% (Track %d/%d)",percent,track+1,(int)[trackList count]);
 				fflush(stderr);
 				lastPercent = percent;
 			}

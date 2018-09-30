@@ -130,7 +130,10 @@ static int sample_compare(const void *A, const void *B, int numSamples, unsigned
 						 ioFlags:(uint32_t*)flags
 {
 	int i;
-	if(decodeBufferSize < bufferLength*2) decodeBuffer = realloc(decodeBuffer, bufferLength*2);
+	if(decodeBufferSize < bufferLength*2) {
+		decodeBuffer = realloc(decodeBuffer, bufferLength*2);
+		decodeBufferSize = bufferLength*2;
+	}
 	int ret = [decoder decodeToBuffer:decodeBuffer frames:bufferLength/4];
 	for(i=0;i<ret;i++) {
 		short L = decodeBuffer[i*2] >> 16;
@@ -148,7 +151,10 @@ static int sample_compare(const void *A, const void *B, int numSamples, unsigned
  ioFlags:(uint32_t*)flags
 {
 	int i;
-	if(decodeBufferSize < bufferLength*2) decodeBuffer = realloc(decodeBuffer, bufferLength*2);
+	if(decodeBufferSize < bufferLength*2) {
+		decodeBuffer = realloc(decodeBuffer, bufferLength*2);
+		decodeBufferSize = bufferLength*2;
+	}
 	int ret = [decoder decodeToBuffer:decodeBuffer frames:bufferLength/4];
 	for(i=0;i<ret;i++) {
 		short L = decodeBuffer[i*2] >> 16;
@@ -217,7 +223,10 @@ static int sample_compare(const void *A, const void *B, int numSamples, unsigned
 					   length:(uint32_t)bufferLength atAddress:(uint64_t)address 
 					blockSize:(uint32_t)blockSize ioFlags:(uint32_t*)flags
 {
-	if(decodeBufferSize < bufferLength*2) decodeBuffer = realloc(decodeBuffer, bufferLength*2);
+    if(decodeBufferSize < bufferLength*2) {
+        decodeBuffer = realloc(decodeBuffer, bufferLength*2);
+        decodeBufferSize = bufferLength*2;
+    }
 	if(verifyBufferSize < bufferLength) verifyBuffer = realloc(verifyBuffer, bufferLength);
 	int ret = [decoder decodeToBuffer:decodeBuffer frames:bufferLength/4];
 	gapVerified += ret*4;

@@ -597,6 +597,12 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
 	}
 	
 	FILE *fp = fopen(path,"rb");
+	if(!fp) {
+		error = YES;
+		FLAC__stream_decoder_delete(flac);
+		flac = NULL;
+		return NO;
+	}
 	char temp[4];
 	fread(temp,1,4,fp);
 	fclose(fp);

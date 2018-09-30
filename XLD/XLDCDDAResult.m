@@ -134,10 +134,10 @@ static BOOL dumpAccurateRipLog(NSMutableString *out, cddaRipResult *result)
 	[super init];
 	detectedOffset = [[NSMutableDictionary alloc] init];
 	trackList = [[NSMutableArray alloc] init];
-#if !USE_EBUR128
-	rg = (replaygain_t *)malloc(sizeof(replaygain_t));
-	gain_init_analysis(rg,44100);
-#endif
+	XLDGainAnalyzerMode mode = XLDGainAnalyzerModeEBUR128;
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	if([defs integerForKey:@"XLDGainAnalyzerFormula"] == 1) mode = XLDGainAnalyzerModeReplayGain;
+	analyzer = XLDGainAnalyzer_Init(44100, 2, mode);
 	logDirectoryArray = [[NSMutableArray alloc] init];
 	cueDirectoryArray = [[NSMutableArray alloc] init];
 	return self;
@@ -150,17 +150,10 @@ static BOOL dumpAccurateRipLog(NSMutableString *out, cddaRipResult *result)
 	indexArr = (xldoffset_t *)malloc(sizeof(xldoffset_t)*t);
 	lengthArr = (xldoffset_t *)malloc(sizeof(xldoffset_t)*t);
 	actualLengthArr = (xldoffset_t *)malloc(sizeof(xldoffset_t)*t);
-#if USE_EBUR128
-	r128 = calloc(t,sizeof(ebur128_state*));
-#endif
 	int i;
 	for(i=0;i<t+1;i++) {
 		results[i].suspiciousPosition = [[NSMutableArray alloc] init];
-#if USE_EBUR128
-		results[i].r128 = ebur128_init(2, 44100, EBUR128_MODE_I|EBUR128_MODE_SAMPLE_PEAK);
-#else
-		results[i].rg = rg;
-#endif
+		results[i].analyzer = analyzer;
 		results[i].detectedOffset = [[NSMutableDictionary alloc] init];
 		results[i].validator = [[XLDTrackValidator alloc] init];
 		[results[i].validator setTrackNumber:i];
@@ -180,9 +173,6 @@ static BOOL dumpAccurateRipLog(NSMutableString *out, cddaRipResult *result)
 			[results[i].suspiciousPosition release];
 			[results[i].detectedOffset release];
 			[results[i].validator release];
-#if USE_EBUR128
-			ebur128_destroy(&results[i].r128);
-#endif
 		}
 		free(results);
 	}
@@ -203,11 +193,7 @@ static BOOL dumpAccurateRipLog(NSMutableString *out, cddaRipResult *result)
 	if(cueFileName) [cueFileName release];
 	[logDirectoryArray release];
 	[cueDirectoryArray release];
-#if USE_EBUR128
-	if(r128) free(r128);
-#else
-	free(rg);
-#endif
+	XLDGainAnalyzer_Destroy(&analyzer);
 	if(mediaType) [mediaType release];
 	[super dealloc];
 }
@@ -325,24 +311,9 @@ static BOOL dumpAccurateRipLog(NSMutableString *out, cddaRipResult *result)
 {
 	if(gainAnalyzed) return;
 	int i;
-#if USE_EBUR128
-	for(i=1;i<trackNumber+1;i++) {
-		if(results[i].peak >= 0) r128[r128TrackCount++] = results[i].r128;
-	}
-#endif
 	if(results[0].enabled) {
 		if(!results[0].cancelled && results[0].scanReplayGain) {
-#if USE_EBUR128
-			albumPeak = 0;
-			ebur128_loudness_global_multiple(r128, r128TrackCount, &albumGain);
-			albumGain = ebur128_reference_loudness - albumGain;
-			for(i=1;i<trackNumber+1;i++) {
-				if(results[i].peak > albumPeak) albumPeak = results[i].peak;
-			}
-#else
-			albumGain = PINK_REF-gain_get_album(rg);
-			albumPeak = peak_get_album(rg);
-#endif
+			XLDGainAnalyzer_GetAlbumGainAndPeak(analyzer, &albumGain, &albumPeak);
 			for(i=0;i<[trackList count];i++) {
 				[[[trackList objectAtIndex:i] metadata] setObject:[NSNumber numberWithDouble:albumGain] forKey:XLD_METADATA_REPLAYGAIN_ALBUM_GAIN];
 				[[[trackList objectAtIndex:i] metadata] setObject:[NSNumber numberWithDouble:albumPeak] forKey:XLD_METADATA_REPLAYGAIN_ALBUM_PEAK];
@@ -370,17 +341,7 @@ static BOOL dumpAccurateRipLog(NSMutableString *out, cddaRipResult *result)
 			}
 		}
 		if(results[0].scanReplayGain) {
-#if USE_EBUR128
-			albumPeak = 0;
-			ebur128_loudness_global_multiple(r128, r128TrackCount, &albumGain);
-			albumGain = ebur128_reference_loudness - albumGain;
-			for(i=1;i<trackNumber+1;i++) {
-				if(results[i].peak > albumPeak) albumPeak = results[i].peak;
-			}
-#else
-			albumGain = PINK_REF-gain_get_album(rg);
-			albumPeak = peak_get_album(rg);
-#endif
+			XLDGainAnalyzer_GetAlbumGainAndPeak(analyzer, &albumGain, &albumPeak);
 			for(i=0;i<[trackList count];i++) {
 				[[[trackList objectAtIndex:i] metadata] setObject:[NSNumber numberWithDouble:albumGain] forKey:XLD_METADATA_REPLAYGAIN_ALBUM_GAIN];
 				[[[trackList objectAtIndex:i] metadata] setObject:[NSNumber numberWithDouble:albumPeak] forKey:XLD_METADATA_REPLAYGAIN_ALBUM_PEAK];

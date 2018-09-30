@@ -9,11 +9,7 @@
 
 #define USE_EBUR128 1
 #import <Cocoa/Cocoa.h>
-#if USE_EBUR128
-#import "ebur128.h"
-#else
-#import "gain_analysis.h"
-#endif
+#import "XLDGainAnalyzer.h"
 #import "XLDTrackValidator.h"
 
 typedef struct {
@@ -49,12 +45,7 @@ typedef struct {
 	int *postTrackSamples;
 	NSMutableDictionary *detectedOffset;
 	NSMutableArray *trackList;
-#if USE_EBUR128
-	ebur128_state **r128;
-	int r128TrackCount;
-#else
-	replaygain_t *rg;
-#endif
+	XLDGainAnalyzer *analyzer;
 	double percent;
 }
 - (id)initWithTracks:(NSArray *)tracks totalFrames:(xldoffset_t)frame;

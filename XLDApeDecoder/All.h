@@ -106,6 +106,11 @@ Global types and macros
 	#define _tcsncpy                                    strncpy
 	#define TCHAR                                       char
 	#define _tmain                                      main
+#ifdef __x86_64__
+    typedef long long intorptr_t;
+#else
+    typedef int intorptr_t;
+#endif
 #endif
 #include "SmartPtr.h"
 

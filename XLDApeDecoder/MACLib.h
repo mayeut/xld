@@ -285,7 +285,7 @@ public:
     //    int nParam2
     //        generic parameter... usage is listed in APE_DECOMPRESS_FIELDS
     //////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int GetInfo(APE_DECOMPRESS_FIELDS Field, int nParam1 = 0, int nParam2 = 0) = 0;
+    virtual intorptr_t GetInfo(APE_DECOMPRESS_FIELDS Field, intorptr_t nParam1 = 0, int nParam2 = 0) = 0;
 };
 
 /*************************************************************************************************

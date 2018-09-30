@@ -29,6 +29,13 @@ THE SOFTWARE. */
 /* This can be replaced by any BSD-like queue implementation. */
 #include <sys/queue.h>
 
+#ifndef STAILQ_FOREACH
+#define	STAILQ_FOREACH(var, head, field)				\
+for((var) = STAILQ_FIRST((head));				\
+(var);							\
+(var) = STAILQ_NEXT((var), field))
+#endif
+
 #define CHECK_ERROR(condition, errorcode, goto_point)                          \
   if ((condition)) {                                                           \
     errcode = (errorcode);                                                     \

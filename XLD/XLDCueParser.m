@@ -126,6 +126,31 @@ static NSStringEncoding detectEncoding(FILE *fp)
 	return [NSString defaultCStringEncoding];
 }
 
+static BOOL isUTF8Encoded(FILE *fp)
+{
+	char buf[2048];
+	char tmp[2048];
+	char *ptr = buf;
+	int len = 0;
+	CFStringRef utf8Str;
+	
+	while(fgets_private(tmp,2048,fp) != NULL) {
+		int ret = strlen(tmp);
+		len += ret;
+		if(len > 2048) {
+			len -= ret;
+			break;
+		}
+		memcpy(ptr,tmp,ret);
+		ptr += ret;
+	}
+	
+	utf8Str = CFStringCreateWithBytes(NULL, (const UInt8 *)buf, len, kCFStringEncodingUTF8,false);
+	if(!utf8Str) return NO;
+	CFRelease(utf8Str);
+	return YES;
+}
+
 static NSString *readMetadataFromLineBuf(char *cuebuf, int pos, NSStringEncoding enc, BOOL robustEncoding)
 {
 	int j, delimiter=0;
@@ -377,6 +402,9 @@ static NSString *mountNameFromBSDName(const char *bsdName)
 	}
 	else {
 		enc = [delegate encoding];
+		if(enc == NSISOLatin1StringEncoding || enc == NSWindowsCP1252StringEncoding || enc == NSMacOSRomanStringEncoding) {
+			if(isUTF8Encoded(fp)) enc = NSUTF8StringEncoding;
+		}
 	}
 	int read = 0;
 	
@@ -654,6 +682,9 @@ static NSString *mountNameFromBSDName(const char *bsdName)
 	}
 	else {
 		enc = [delegate encoding];
+		if(enc == NSISOLatin1StringEncoding || enc == NSWindowsCP1252StringEncoding || enc == NSMacOSRomanStringEncoding) {
+			if(isUTF8Encoded(fp)) enc = NSUTF8StringEncoding;
+		}
 	}
 	int read = 0;
 	
@@ -1037,6 +1068,9 @@ last:
 	}
 	else {
 		enc = [delegate encoding];
+		if(enc == NSISOLatin1StringEncoding || enc == NSWindowsCP1252StringEncoding || enc == NSMacOSRomanStringEncoding) {
+			if(isUTF8Encoded(fp)) enc = NSUTF8StringEncoding;
+		}
 	}
 	int read = 0;
 	

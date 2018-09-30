@@ -2126,8 +2126,12 @@ last:
 		[[trk metadata] setObject:obj forKey:XLD_METADATA_DISC];
 	if(obj = [[[trackList objectAtIndex:0] metadata] objectForKey:XLD_METADATA_TOTALDISCS])
 		[[trk metadata] setObject:obj forKey:XLD_METADATA_TOTALDISCS];
-    if(obj = [[[trackList objectAtIndex:0] metadata] objectForKey:@"XLD_METADATA_DSDDecoder_Configurations"])
-        [[trk metadata] setObject:obj forKey:@"XLD_METADATA_DSDDecoder_Configurations"];
+	if(obj = [[[trackList objectAtIndex:0] metadata] objectForKey:XLD_METADATA_CATALOG])
+		[[trk metadata] setObject:obj forKey:XLD_METADATA_CATALOG];
+	if(obj = [[[trackList objectAtIndex:0] metadata] objectForKey:XLD_METADATA_FREEDBDISCID])
+		[[trk metadata] setObject:obj forKey:XLD_METADATA_FREEDBDISCID];
+	if(obj = [[[trackList objectAtIndex:0] metadata] objectForKey:@"XLD_METADATA_DSDDecoder_Configurations"])
+		[[trk metadata] setObject:obj forKey:@"XLD_METADATA_DSDDecoder_Configurations"];
 	
 	/*NSMutableData *cue = [self cueData];
 	[cue replaceBytesInRange:rangeForCuesheet withBytes:"CDImage.wav" length:11];*/

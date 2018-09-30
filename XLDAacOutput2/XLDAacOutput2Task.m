@@ -1293,7 +1293,7 @@ NSMutableData *buildChapterData(NSArray *trackList)
 	FILE *fp = fopen([path UTF8String], "r+b");
 	if(!fp) return;
 	
-	if(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4) {
+	if(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4 && floor(NSAppKitVersionNumber) < 1343) {
 		if(![[[NSBundle bundleWithIdentifier:@"jp.tmkk.XLDAacOutput2"] objectForInfoDictionaryKey: @"XLDAacOutputUseDiskCache"] boolValue])
 			fcntl(fileno(fp), F_NOCACHE, 1);
 	}
@@ -1473,7 +1473,7 @@ end:
 	struct stat stbuf;
 	stat([path UTF8String], &stbuf);
 	
-	if(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4) {
+	if(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4 && floor(NSAppKitVersionNumber) < 1343) {
 		if(![[[NSBundle bundleWithIdentifier:@"jp.tmkk.XLDAacOutput2"] objectForInfoDictionaryKey: @"XLDAacOutputUseDiskCache"] boolValue])
 			fcntl(fileno(fp), F_NOCACHE, 1);
 	}
@@ -1585,7 +1585,7 @@ end:
 		if(!fp) return;
 		//NSLog(@"DEBUG: fopen success");
 		
-		if(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4) {
+		if(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4 && floor(NSAppKitVersionNumber) < 1343) {
 			if(![[[NSBundle bundleWithIdentifier:@"jp.tmkk.XLDAacOutput2"] objectForInfoDictionaryKey: @"XLDAacOutputUseDiskCache"] boolValue])
 				fcntl(fileno(fp), F_NOCACHE, 1);
 		}

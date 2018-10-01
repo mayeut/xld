@@ -21,6 +21,7 @@
 #import <math.h>
 
 #define NSAppKitVersionNumber10_5 949
+extern int XLDDarkModeSupportEnabled;
 
 typedef struct {
 	struct timeval tv1,tv2,tv_start;
@@ -63,7 +64,11 @@ typedef struct {
 	[speedField setEditable:NO];
 	[[speedField cell] setWraps:NO];
 	[speedField setBackgroundColor:[NSColor controlColor]];
-	[speedField setTextColor:[NSColor darkGrayColor]];
+	if(XLDDarkModeSupportEnabled) {
+		[speedField setTextColor:[[NSColor controlTextColor] blendedColorWithFraction:0.3 ofColor:[NSColor controlBackgroundColor]]];
+	} else {
+		[speedField setTextColor:[NSColor darkGrayColor]];
+	}
 	[speedField setFont:[NSFont systemFontOfSize:9]];
 	
 	progress = [[NSProgressIndicator alloc] init];

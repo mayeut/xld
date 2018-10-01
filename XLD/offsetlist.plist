@@ -3724,6 +3724,10 @@
 	<integer>48</integer>
 	<key>DVD+--R-RW8XMAX</key>
 	<integer>12</integer>
+	<key>DVD+--RW DW316</key>
+	<integer>6</integer>
+	<key>DVD+--RW DW514</key>
+	<integer>103</integer>
 	<key>DVD+--RW Dual-X1</key>
 	<integer>48</integer>
 	<key>DVD+--RW True-8X</key>

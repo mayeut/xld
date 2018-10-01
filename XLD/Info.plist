@@ -150,7 +150,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>151.0</string>
+	<string>151.1</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© tmkk, 2006-2018</string>
 	<key>NSMainNibFile</key>
@@ -158,7 +158,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
-	<string>https://svn.code.sf.net/p/xld/code/appcast/xld-appcast_e.xml</string>
+	<string>https://sourceforge.net/p/xld/code/HEAD/tree/appcast/xld-appcast_e.xml?format=raw</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>

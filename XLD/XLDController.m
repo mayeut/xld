@@ -1922,6 +1922,16 @@ end:
 	for(i=0;i<[bundleArr count];i++) {
 		bundle = [NSBundle bundleWithPath:[bundleArr objectAtIndex:i]];
 		if(bundle) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+			NSArray *archArray = [bundle executableArchitectures];
+#if defined(__x86_64__)
+			if([archArray indexOfObject:@(NSBundleExecutableArchitectureX86_64)] == NSNotFound) continue;
+#elif defined(__i386__)
+			if([archArray indexOfObject:@(NSBundleExecutableArchitectureI386)] == NSNotFound) continue;
+#elif defined(__ppc__)
+			if([archArray indexOfObject:@(NSBundleExecutableArchitecturePPC)] == NSNotFound) continue;
+#endif
+#endif
 			if([bundle load]) {
 				if([[bundle principalClass] conformsToProtocol:@protocol(XLDOutput)] && [[bundle principalClass] canLoadThisBundle]) {
 					output = [[[bundle principalClass] alloc] init];

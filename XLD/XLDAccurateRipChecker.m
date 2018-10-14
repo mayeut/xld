@@ -408,7 +408,8 @@ static BOOL dumpAccurateRipLog(NSMutableString *out, checkResult *result)
 		}
 		
 		if(currentTrack > trackNumber) {
-			[o_progress setDoubleValue:100.0];
+			percent = 100.0;
+			[self performSelectorOnMainThread:@selector(updateStatus) withObject:nil waitUntilDone:YES];
 			break;
 		}
 	} while(1);
@@ -416,7 +417,7 @@ static BOOL dumpAccurateRipLog(NSMutableString *out, checkResult *result)
 finish:
 		free(buffer);
 	[decoder closeFile];
-	[o_panel close];
+	[o_panel performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 	[delegate performSelectorOnMainThread:@selector(accurateRipCheckDidFinish:) withObject:self waitUntilDone:NO];
 	[pool release];
 }
@@ -500,7 +501,7 @@ finish:
 finish:
 		free(buffer);
 	[decoder closeFile];
-	[o_panel close];
+	[o_panel performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 	[delegate performSelectorOnMainThread:@selector(offsetCheckDidFinish:) withObject:self waitUntilDone:NO];
 	[pool release];
 }
@@ -574,7 +575,8 @@ finish:
 		}
 		
 		if(currentTrack > trackNumber) {
-			[o_progress setDoubleValue:100.0];
+			percent = 100.0;
+			[self performSelectorOnMainThread:@selector(updateStatus) withObject:nil waitUntilDone:YES];
 			break;
 		}
 	} while(1);
@@ -582,7 +584,7 @@ finish:
 finish:
 		free(buffer);
 	[decoder closeFile];
-	[o_panel close];
+	[o_panel performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 	[delegate performSelectorOnMainThread:@selector(replayGainScanningDidFinish:) withObject:self waitUntilDone:NO];
 	[pool release];
 }

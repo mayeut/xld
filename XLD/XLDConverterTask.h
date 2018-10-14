@@ -42,6 +42,7 @@
 	NSTextField *nameField;
 	NSTextField *statusField;
 	NSTextField *speedField;
+	BOOL guiPrepared;
 	
 	id queue;
 	XLDScaleType scaleType;

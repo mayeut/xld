@@ -2488,6 +2488,39 @@ end:
 	}
 }
 
+- (void)showLogStr:(NSString *)logStr
+{
+	NSDictionary *attributes = [NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName];
+	NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:logStr attributes:attributes];
+	[[o_logView textStorage] setAttributedString:attributedString];
+	[[o_logView textStorage] setFont:[NSFont fontWithName:@"Monaco" size:10]];
+	[o_logView scrollRangeToVisible: NSMakeRange(0,0)];
+	[o_logWindow makeKeyAndOrderFront:self];
+	[attributedString release];
+}
+
+- (void)updateProgressBarOnMainThread:(double)value withMaxValue:(double)maxValue
+{
+	if(value > 0) {
+		SEL selector = @selector(setDoubleValue:);
+		NSMethodSignature* signature = [o_detectPregapProgress methodSignatureForSelector:selector];
+		NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
+		[invocation setTarget:o_detectPregapProgress];
+		[invocation setSelector:selector];
+		[invocation setArgument:(void *)&value atIndex:2];
+		[invocation performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:YES];
+	}
+	if(maxValue > 0) {
+		SEL selector = @selector(setMaxValue:);
+		NSMethodSignature* signature = [o_detectPregapProgress methodSignatureForSelector:selector];
+		NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
+		[invocation setTarget:o_detectPregapProgress];
+		[invocation setSelector:selector];
+		[invocation setArgument:(void *)&maxValue atIndex:2];
+		[invocation performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:YES];
+	}
+}
+
 - (NSString *)subdirInDir:(NSString *)dir baseDir:(NSString *)base file:(NSString *)file
 {
 	if(!base || !file) return nil;
@@ -2508,14 +2541,14 @@ end:
 	BOOL removeFlag = NO;
 	if(![queue count]) {
 		[pool2 release];
-		[o_detectPregapPane close];
+		[o_detectPregapPane performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 		openingFiles = NO;
 		return;
 	}
 	if([[o_outputSelectRadio selectedCell] tag] && ![[NSFileManager defaultManager] isWritableFileAtPath:[o_outputDir stringValue]]) {
 		NSRunCriticalAlertPanel(LS(@"error"), LS(@"no write permission"), @"OK", nil, nil);
 		[pool2 release];
-		[o_detectPregapPane close];
+		[o_detectPregapPane performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 		openingFiles = NO;
 		return;
 	}
@@ -2538,7 +2571,7 @@ end:
 		if(cancelScan) {
 			goto end;
 		}
-		[o_detectPregapProgress setDoubleValue:i];
+		[self updateProgressBarOnMainThread:i withMaxValue:-1];
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		NSFileManager *fm = [NSFileManager defaultManager];
 		NSString *file = [sortedQueue objectAtIndex:i];
@@ -2700,7 +2733,7 @@ next:
 		[pool release];
 	}
 	
-	[o_detectPregapPane close];
+	[o_detectPregapPane performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 	
 	if(![trackArray count]) goto end;
 	
@@ -2777,7 +2810,7 @@ end:
 	[rangeArray release];
 	if(baseDir) [baseDir release];
 	[queue removeAllObjects];
-	[o_detectPregapPane close];
+	[o_detectPregapPane performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 	[pool2 release];
 	openingFiles = NO;
 }
@@ -3356,6 +3389,19 @@ end:
 	[self performSelector:@selector(updateCDDAList:) withObject:nil afterDelay:1.0];
 }
 
+- (void)updateOffsetCorrectionValueWithDriveName:(NSString *)driveName
+{
+	if([o_autoSetOffsetValue state] == NSOnState) {
+		NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"offsetlist" ofType:@"plist"]];
+		if([dic objectForKey:driveName]) {
+			[o_offsetCorrectionValue setIntValue:[[dic objectForKey:driveName] intValue]];
+		}
+		else if([dic objectForKey:[driveName substringToIndex:[driveName length]-1]]) {
+			[o_offsetCorrectionValue setIntValue:[[dic objectForKey:[driveName substringToIndex:[driveName length]-1]] intValue]];
+		}
+	}
+}
+
 - (void)readPreGapOfDisc:(NSString *)volume
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -3374,18 +3420,12 @@ end:
 	
 	if(xld_cdda_open(&cdread, statDisc.f_mntfromname) == 0) {
 		driveIsBusy = YES;
-		if([o_autoSetOffsetValue state] == NSOnState && cdread.product) {
-			NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"offsetlist" ofType:@"plist"]];
-			NSString *product = [NSString stringWithUTF8String:cdread.product];
-			if([dic objectForKey:product]) {
-				[o_offsetCorrectionValue setIntValue:[[dic objectForKey:product] intValue]];
-			}
-			else if([dic objectForKey:[product substringToIndex:[product length]-1]]) {
-				[o_offsetCorrectionValue setIntValue:[[dic objectForKey:[product substringToIndex:[product length]-1]] intValue]];
-			}
+		if(cdread.product) {
+			NSString *driveName = [NSString stringWithUTF8String:cdread.product];
+			[self performSelectorOnMainThread:@selector(updateOffsetCorrectionValueWithDriveName:) withObject:driveName waitUntilDone:YES];
 		}
 		NSMutableArray *trackArr = [[NSMutableArray alloc] init];
-		[o_detectPregapProgress setMaxValue:cdread.numTracks-1];
+		[self updateProgressBarOnMainThread:-1 withMaxValue:cdread.numTracks-1];
 		for(i=1;i<=cdread.numTracks;i++) {
 			XLDTrack *track = [[XLDTrack alloc] init];
 			[track setIndex:xld_cdda_track_firstsector(&cdread,i)*588];
@@ -3433,11 +3473,11 @@ end:
 					[[trackArr objectAtIndex:i] setGap:cdread.tracks[i].pregap*588];
 					[[trackArr objectAtIndex:i-1] setFrames:[[trackArr objectAtIndex:i-1] frames] - cdread.tracks[i].pregap*588];
 				}
-				[o_detectPregapProgress setDoubleValue:i];
+				[self updateProgressBarOnMainThread:i withMaxValue:-1];
 			}
 		}
 
-		[o_detectPregapProgress setDoubleValue:cdread.numTracks-1];
+		[self updateProgressBarOnMainThread:cdread.numTracks-1 withMaxValue:-1];
 		//xld_cdda_close(&cdread);
 		//driveIsBusy = NO;
 		XLDCDDARipper *ripper = [[XLDCDDARipper alloc] init];
@@ -3455,15 +3495,24 @@ end:
 		}
 		
 		[trackArr release];
-		[o_detectPregapPane close];
+		[o_detectPregapPane performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 		
 	}
 	else {
-		[o_detectPregapPane close];
+		[o_detectPregapPane performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 		NSRunCriticalAlertPanel(LS(@"error"), LS(@"Device is busy"), @"OK", nil, nil);
 	}
 	
 	[pool release];
+}
+
+- (void)analyzeCacheDidFinishWithLog:(NSString *)log
+{
+	[o_detectPregapProgress stopAnimation:nil];
+	[NSApp endSheet:o_detectPregapPane returnCode:0];
+	[o_detectPregapPane close];
+	
+	[self showLogStr:log];
 }
 
 - (void)analyzeCacheForDrive:(NSString *)dev
@@ -3478,10 +3527,6 @@ end:
 	result.cache_sector_size = -1;
 	result.backseek_flush_capable = -1;
 	int ret = [XLDCDDARipper analyzeCacheForDrive:dev result:&result delegate:self];
-	
-	[o_detectPregapProgress stopAnimation:nil];
-	[NSApp endSheet:o_detectPregapPane returnCode:0];
-	[o_detectPregapPane close];
 	
 	NSMutableString *out =[[NSMutableString alloc] init];
 	[out setString:@""];
@@ -3519,12 +3564,7 @@ end:
 		 */
 	}
 	[out appendString:@"End of status report\n"];
-	NSDictionary *attributes = [NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName];
-	NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:out attributes:attributes];
-	[[o_logView textStorage] setAttributedString:attributedString];
-	[[o_logView textStorage] setFont:[NSFont fontWithName:@"Monaco" size:10]];
-	[o_logWindow makeKeyAndOrderFront:self];
-	
+	[self performSelectorOnMainThread:@selector(analyzeCacheDidFinishWithLog:) withObject:out waitUntilDone:YES];
 	[out release];
 	
 	[opticalDriveManager mountDisc:dev];
@@ -4028,16 +4068,6 @@ end:
 	return ([o_autoSetCompilation state] == NSOnState);
 }
 
-- (void)showLogStr:(NSString *)logStr
-{
-	NSDictionary *attributes = [NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName];
-	NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:logStr attributes:attributes];
-	[[o_logView textStorage] setAttributedString:attributedString];
-	[[o_logView textStorage] setFont:[NSFont fontWithName:@"Monaco" size:10]];
-	[o_logView scrollRangeToVisible: NSMakeRange(0,0)];
-	[o_logWindow makeKeyAndOrderFront:self];
-}
-
 - (void)discRippedWithResult:(id)result
 {
 	/*int i;
@@ -4056,7 +4086,7 @@ end:
 	 }*/
 	[result analyzeGain];
 	NSString *log = [result logStr];
-	if(log) [self showLogStr:log];
+	if(log) [self performSelectorOnMainThread:@selector(showLogStr:) withObject:log waitUntilDone:YES];
 	[result saveLog];
 	[result saveCuesheetIfNeeded];
 	if([result isGoodRip] && ([o_ejectWhenDone state] == NSOnState))
@@ -4074,7 +4104,7 @@ end:
 - (void)accurateRipCheckDidFinish:(id)result
 {
 	NSString *log = [result logStr];
-	if(log) [self showLogStr:log];
+	if(log) [self performSelectorOnMainThread:@selector(showLogStr:) withObject:log waitUntilDone:YES];
 	[result release];
 }
 
@@ -4141,7 +4171,8 @@ end:
 
 - (void)replayGainScanningDidFinish:(id)result
 {
-	if([result logStrForReplayGainScanner]) [self showLogStr:[result logStrForReplayGainScanner]];
+	NSString *log = [result logStrForReplayGainScanner];
+	if(log) [self performSelectorOnMainThread:@selector(showLogStr:) withObject:log waitUntilDone:YES];
 	[result release];
 }
 

@@ -35,111 +35,15 @@ typedef struct {
 	int speedPos;
 } converter_info;
 
-#define REPLAYGAIN_SAMPLE_LENGTH 2205
+static const int fontSizeForName = 13;
+static const int fontSizeForStatus = 11;
+static const int fontSizeForSpeed = 9;
 
 @implementation XLDConverterTask
 
 - (id)init
 {
 	[super init];
-	
-	nameField = [[NSTextField alloc] init];
-	[nameField setBordered:NO];
-	[nameField setEditable:NO];
-	[[nameField cell] setWraps:NO];
-	[nameField setBackgroundColor:[NSColor controlColor]];
-	[nameField setFont:[NSFont boldSystemFontOfSize:13]];
-	
-	statusField = [[NSTextField alloc] init];
-	[statusField setBordered:NO];
-	[statusField setEditable:NO];
-	[[statusField cell] setWraps:NO];
-	[statusField setBackgroundColor:[NSColor controlColor]];
-	[statusField setTextColor:[NSColor grayColor]];
-	[statusField setFont:[NSFont systemFontOfSize:11]];
-	[statusField setStringValue:LS(@"Waiting")];
-	
-	speedField = [[NSTextField alloc] init];
-	[speedField setBordered:NO];
-	[speedField setEditable:NO];
-	[[speedField cell] setWraps:NO];
-	[speedField setBackgroundColor:[NSColor controlColor]];
-	if(XLDDarkModeSupportEnabled) {
-		[speedField setTextColor:[[NSColor controlTextColor] blendedColorWithFraction:0.3 ofColor:[NSColor controlBackgroundColor]]];
-	} else {
-		[speedField setTextColor:[NSColor darkGrayColor]];
-	}
-	[speedField setFont:[NSFont systemFontOfSize:9]];
-	
-	progress = [[NSProgressIndicator alloc] init];
-	[progress setControlSize:NSSmallControlSize];
-	[progress setIndeterminate:NO];
-	[progress setStyle:NSProgressIndicatorBarStyle];
-	
-	stopButton = [[NSButton alloc] init];
-	/*[stopButton setButtonType:NSMomentaryLightButton];
-	[[stopButton cell] setControlSize:NSSmallControlSize];
-	[[stopButton cell] setBezelStyle:NSRoundedBezelStyle];
-	[stopButton setFont:[NSFont systemFontOfSize:11]];
-	[stopButton setAction:@selector(stopConvert:)];
-	[stopButton setTarget:self];
-	[stopButton setTitle:LS(@"Cancel")];*/
-	[stopButton setButtonType:NSMomentaryChangeButton];
-	[stopButton setImagePosition:NSImageOnly];
-	[stopButton setBezelStyle:NSRegularSquareBezelStyle];
-	[stopButton setBordered:NO];
-	[stopButton setImage:[NSImage imageNamed:@"ExportStop"]];
-	[stopButton setAlternateImage:[NSImage imageNamed:@"ExportStopPressed"]];
-	[stopButton setAction:@selector(stopConvert:)];
-	[stopButton setTarget:self];
-	
-	superview = [[XLDView alloc] init];
-	NSRect frame0;
-	frame0.origin.x = 0;
-	frame0.origin.y = 0;
-	frame0.size.width = 385;
-	frame0.size.height = 40;
-	NSRect frame1;
-	frame1.origin.x = 10;
-	frame1.origin.y = 30;
-	frame1.size.width = 385;
-	frame1.size.height = 19;
-	NSRect frame4 = frame1;
-	frame4.origin.y = 19;
-	frame4.size.height = 11;
-	NSRect frame2 = frame1;
-	frame2.origin.y = 4;
-	frame2.size.height = 13;
-	frame2.size.width -= 50;
-	NSRect frame3 = frame2;
-	frame3.origin.x += frame2.size.width + 10;
-	frame3.origin.y = 4;
-	frame3.size.width = 15;
-	frame3.size.height = 15;
-	NSRect frame5 = frame2;
-	frame5.origin.y = 11;
-	
-	[superview setFrame:frame0];
-	[progress setFrame:frame2];
-	[nameField setFrame:frame1];
-	[stopButton setFrame:frame3];
-	[statusField setFrame:frame5];
-	[speedField setFrame:frame4];
-	[progress setAutoresizingMask:NSViewWidthSizable];
-	[nameField setAutoresizingMask:NSViewWidthSizable];
-	[stopButton setAutoresizingMask:NSViewMinXMargin];
-	[statusField setAutoresizingMask:NSViewWidthSizable];
-	[speedField setAutoresizingMask:NSViewWidthSizable];
-	[superview setAutoresizingMask:NSViewWidthSizable];
-	if([NSCell instanceMethodForSelector:@selector(setLineBreakMode:)]) {
-		[[nameField cell] setLineBreakMode:NSLineBreakByTruncatingTail];
-	}
-	
-	[superview addSubview:statusField];
-	[superview addSubview:progress];
-	[superview addSubview:nameField];
-	[superview addSubview:speedField];
-	[superview addSubview:stopButton];
 	
 	encoderArray = [[NSMutableArray alloc] init];
 	encoderTaskArray = [[NSMutableArray alloc] init];
@@ -311,8 +215,120 @@ typedef struct {
 	[superview removeFromSuperview];
 }
 
+- (void)prepareGUI
+{
+	if(guiPrepared) return;
+	nameField = [[NSTextField alloc] init];
+	[nameField setBordered:NO];
+	[nameField setEditable:NO];
+	[[nameField cell] setWraps:NO];
+	[nameField setBackgroundColor:[NSColor controlColor]];
+	[nameField setFont:[NSFont boldSystemFontOfSize:fontSizeForName]];
+	
+	statusField = [[NSTextField alloc] init];
+	[statusField setBordered:NO];
+	[statusField setEditable:NO];
+	[[statusField cell] setWraps:NO];
+	[statusField setBackgroundColor:[NSColor controlColor]];
+	[statusField setTextColor:[NSColor grayColor]];
+	[statusField setFont:[NSFont systemFontOfSize:fontSizeForStatus]];
+	[statusField setStringValue:LS(@"Waiting")];
+	
+	speedField = [[NSTextField alloc] init];
+	[speedField setBordered:NO];
+	[speedField setEditable:NO];
+	[[speedField cell] setWraps:NO];
+	[speedField setBackgroundColor:[NSColor controlColor]];
+	if(XLDDarkModeSupportEnabled) {
+		[speedField setTextColor:[[NSColor controlTextColor] blendedColorWithFraction:0.3 ofColor:[NSColor controlBackgroundColor]]];
+	} else {
+		[speedField setTextColor:[NSColor darkGrayColor]];
+	}
+	[speedField setFont:[NSFont systemFontOfSize:fontSizeForSpeed]];
+	
+	progress = [[NSProgressIndicator alloc] init];
+	[progress setControlSize:NSSmallControlSize];
+	[progress setIndeterminate:NO];
+	[progress setStyle:NSProgressIndicatorBarStyle];
+	
+	stopButton = [[NSButton alloc] init];
+	/*[stopButton setButtonType:NSMomentaryLightButton];
+	 [[stopButton cell] setControlSize:NSSmallControlSize];
+	 [[stopButton cell] setBezelStyle:NSRoundedBezelStyle];
+	 [stopButton setFont:[NSFont systemFontOfSize:11]];
+	 [stopButton setAction:@selector(stopConvert:)];
+	 [stopButton setTarget:self];
+	 [stopButton setTitle:LS(@"Cancel")];*/
+	[stopButton setButtonType:NSMomentaryChangeButton];
+	[stopButton setImagePosition:NSImageOnly];
+	[stopButton setBezelStyle:NSRegularSquareBezelStyle];
+	[stopButton setBordered:NO];
+	[stopButton setImage:[NSImage imageNamed:@"ExportStop"]];
+	[stopButton setAlternateImage:[NSImage imageNamed:@"ExportStopPressed"]];
+	[stopButton setAction:@selector(stopConvert:)];
+	[stopButton setTarget:self];
+	
+	superview = [[XLDView alloc] init];
+	NSRect frame0;
+	frame0.origin.x = 0;
+	frame0.origin.y = 0;
+	frame0.size.width = 385;
+	frame0.size.height = 40;
+	NSRect frame1;
+	frame1.origin.x = 10;
+	frame1.origin.y = 30;
+	frame1.size.width = 385;
+	frame1.size.height = 19;
+	NSRect frame4 = frame1;
+	frame4.origin.y = 19;
+	frame4.size.height = 11;
+	NSRect frame2 = frame1;
+	frame2.origin.y = 4;
+	frame2.size.height = 13;
+	frame2.size.width -= 50;
+	NSRect frame3 = frame2;
+	frame3.origin.x += frame2.size.width + 10;
+	frame3.origin.y = 4;
+	frame3.size.width = 15;
+	frame3.size.height = 15;
+	NSRect frame5 = frame2;
+	frame5.origin.y = 11;
+	
+	[superview setFrame:frame0];
+	[progress setFrame:frame2];
+	[nameField setFrame:frame1];
+	[stopButton setFrame:frame3];
+	[statusField setFrame:frame5];
+	[speedField setFrame:frame4];
+	[progress setAutoresizingMask:NSViewWidthSizable];
+	[nameField setAutoresizingMask:NSViewWidthSizable];
+	[stopButton setAutoresizingMask:NSViewMinXMargin];
+	[statusField setAutoresizingMask:NSViewWidthSizable];
+	[speedField setAutoresizingMask:NSViewWidthSizable];
+	[superview setAutoresizingMask:NSViewWidthSizable];
+	if([NSCell instanceMethodForSelector:@selector(setLineBreakMode:)]) {
+		[[nameField cell] setLineBreakMode:NSLineBreakByTruncatingTail];
+	}
+	
+	[superview addSubview:statusField];
+	[superview addSubview:progress];
+	[superview addSubview:nameField];
+	[superview addSubview:speedField];
+	[superview addSubview:stopButton];
+	guiPrepared = YES;
+}
+
 - (void)showProgressInView:(NSTableView *)view row:(int)row
 {
+	[self prepareGUI];
+	NSMutableString *titleStr = [NSMutableString stringWithString:[track desiredFileName]];
+	NSRange formatIndicatorRange = [titleStr rangeOfString:@"[[[XLD_FORMAT_INDICATOR]]]"];
+	if(formatIndicatorRange.location != NSNotFound) {
+		[titleStr replaceOccurrencesOfString:@"[[[XLD_FORMAT_INDICATOR]]]" withString:LS(@"Multiple Formats") options:0 range:NSMakeRange(0, [titleStr length])];
+	}
+	if(testMode) [nameField setStringValue:[NSString stringWithFormat:@"(Test) %@",titleStr]];
+	else [nameField setStringValue:titleStr];
+	
 	position = row;
 	NSRect frame1 = [view frameOfCellAtColumn:0 row:row];
 	[superview setFrame:frame1];
@@ -323,6 +339,14 @@ typedef struct {
 	}
 	
 	[view addSubview:superview];
+}
+
+- (void)updateStatusMessage:(NSString *)message withFont:(NSFont *)font andColor:(NSColor *)color
+{
+	if(color) [statusField setTextColor:color];
+	if(font) [statusField setFont:font];
+	[statusField setStringValue:message];
+	[statusField setHidden:NO];
 }
 
 - (void)beginConvert
@@ -378,10 +402,7 @@ typedef struct {
 	if(![(id <XLDDecoder>)decoder openFile:(char *)[inFile UTF8String]]) {
 		[stopButton removeFromSuperview];
 		[superview setTag:1];
-		[statusField setTextColor:[NSColor redColor]];
-		[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-		[statusField setStringValue:LS(@"Error: cannot open the input file")];
-		[statusField setHidden:NO];
+		[self updateStatusMessage:LS(@"Error: cannot open the input file") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 		[decoder closeFile];
 		if(ripResult) ripResult->pending = YES;
 		//[self hideProgress];
@@ -405,10 +426,7 @@ typedef struct {
 			if(![fm isWritableFileAtPath:[outputPathStr stringByDeletingLastPathComponent]]) {
 				[stopButton removeFromSuperview];
 				[superview setTag:1];
-				[statusField setTextColor:[NSColor redColor]];
-				[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-				[statusField setStringValue:LS(@"Error: cannot write the output file")];
-				[statusField setHidden:NO];
+				[self updateStatusMessage:LS(@"Error: cannot write the output file") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 				[decoder closeFile];
 				if(ripResult) ripResult->pending = YES;
 				//[self hideProgress];
@@ -419,9 +437,7 @@ typedef struct {
 				if([fm fileExistsAtPath:outputPathStr]) {
 					[stopButton removeFromSuperview];
 					[superview setTag:1];
-					[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-					[statusField setStringValue:LS(@"Skipped: file already exists in the output path")];
-					[statusField setHidden:NO];
+					[self updateStatusMessage:LS(@"Skipped: file already exists in the output path") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:nil];
 					[decoder closeFile];
 					if(ripResult) ripResult->pending = YES;
 					//[self hideProgress];
@@ -477,10 +493,7 @@ typedef struct {
 				if(![fm isWritableFileAtPath:[outputPathStr stringByDeletingLastPathComponent]]) {
 					[stopButton removeFromSuperview];
 					[superview setTag:1];
-					[statusField setTextColor:[NSColor redColor]];
-					[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-					[statusField setStringValue:LS(@"Error: cannot write the output file")];
-					[statusField setHidden:NO];
+					[self updateStatusMessage:LS(@"Error: cannot write the output file") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 					[decoder closeFile];
 					if(ripResult) ripResult->pending = YES;
 					//[self hideProgress];
@@ -511,9 +524,7 @@ typedef struct {
 			if([encoderTaskArray count] == 0) {
 				[stopButton removeFromSuperview];
 				[superview setTag:1];
-				[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-				[statusField setStringValue:LS(@"Skipped: file already exists in the output path")];
-				[statusField setHidden:NO];
+				[self updateStatusMessage:LS(@"Skipped: file already exists in the output path") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:nil];
 				[decoder closeFile];
 				if(ripResult) ripResult->pending = YES;
 				//[self hideProgress];
@@ -601,10 +612,7 @@ typedef struct {
 	if([(id <XLDDecoder>)decoder error]) {
 		[stopButton removeFromSuperview];
 		[superview setTag:1];
-		[statusField setTextColor:[NSColor redColor]];
-		[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-		[statusField setStringValue:LS(@"Error: seek failure")];
-		[statusField setHidden:NO];
+		[self updateStatusMessage:LS(@"Error: seek failure") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 		[decoder closeFile];
 		//[self hideProgress];
 		[queue performSelectorOnMainThread:@selector(convertFinished:) withObject:self waitUntilDone:NO];
@@ -640,10 +648,7 @@ typedef struct {
 			[decoder closeFile];
 			[stopButton removeFromSuperview];
 			[superview setTag:1];
-			[statusField setTextColor:[NSColor redColor]];
-			[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-			[statusField setStringValue:LS(@"Error: incompatible output format")];
-			[statusField setHidden:NO];
+			[self updateStatusMessage:LS(@"Error: incompatible output format") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 			//[self hideProgress];
 			[queue performSelectorOnMainThread:@selector(convertFinished:) withObject:self waitUntilDone:NO];
 			return;
@@ -677,10 +682,7 @@ typedef struct {
 			[decoder closeFile];
 			[stopButton removeFromSuperview];
 			[superview setTag:1];
-			[statusField setTextColor:[NSColor redColor]];
-			[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-			[statusField setStringValue:LS(@"Error: cannot write the output file")];
-			[statusField setHidden:NO];
+			[self updateStatusMessage:LS(@"Error: cannot write the output file") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 			//[self hideProgress];
 			[queue performSelectorOnMainThread:@selector(convertFinished:) withObject:self waitUntilDone:NO];
 			return;
@@ -727,10 +729,7 @@ typedef struct {
 			[decoder closeFile];
 			[stopButton removeFromSuperview];
 			[superview setTag:1];
-			[statusField setTextColor:[NSColor redColor]];
-			[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-			[statusField setStringValue:LS(@"Error: cannot write the output file")];
-			[statusField setHidden:NO];
+			[self updateStatusMessage:LS(@"Error: cannot write the output file") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 			//[self hideProgress];
 			[queue performSelectorOnMainThread:@selector(convertFinished:) withObject:self waitUntilDone:NO];
 			return;
@@ -774,6 +773,27 @@ typedef struct {
 		[progress setDoubleValue:percent];
 		[speedField setStringValue:[NSString stringWithFormat:LS(@"%.1f %%, %.1fx realtime, %d:%02d remaining"),percent,speed,(int)remainingMin,(int)remainingSec]];
 	}
+}
+
+- (void)updateStatusMessageOnMainThread:(NSString *)message withFont:(NSFont *)font andColor:(NSColor *)color
+{
+	SEL selector = @selector(updateStatusMessage:withFont:andColor:);
+	NSMethodSignature* signature = [self methodSignatureForSelector:selector];
+	NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
+	[invocation setTarget:self];
+	[invocation setSelector:selector];
+	[invocation setArgument:(void *)&message atIndex:2];
+	[invocation setArgument:(void *)&font atIndex:3];
+	[invocation setArgument:(void *)&color atIndex:4];
+	[invocation retainArguments];
+	[invocation performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:YES];
+}
+
+- (void)cleanupSubviews
+{
+	[progress removeFromSuperview];
+	[speedField removeFromSuperview];
+	[stopButton removeFromSuperview];
 }
 
 - (BOOL)writeBuffer:(int *)buffer ForMultipleTasks:(int)ret
@@ -913,9 +933,7 @@ typedef struct {
 		if([(id <XLDDecoder>)decoder error]) {
 			//fprintf(stderr,"error: cannot decode\n");
 			info->error = YES;
-			[statusField setTextColor:[NSColor redColor]];
-			[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-			[statusField setStringValue:LS(@"Error has occurred in the decoder")];
+			[self updateStatusMessageOnMainThread:LS(@"Error has occurred in the decoder") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 			[pool2 release];
 			break;
 		}
@@ -926,9 +944,7 @@ typedef struct {
 				if(![encoderTask writeBuffer:info->buffer frames:ret]) {
 					//fprintf(stderr,"error: cannot output sample\n");
 					info->error = YES;
-					[statusField setTextColor:[NSColor redColor]];
-					[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-					[statusField setStringValue:LS(@"Error has occurred in the encoder")];
+					[self updateStatusMessageOnMainThread:LS(@"Error has occurred in the encoder") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 					[pool2 release];
 					break;
 				}
@@ -937,9 +953,7 @@ typedef struct {
 				if(![self writeBuffer:info->buffer ForMultipleTasks:ret]) {
 					//fprintf(stderr,"error: cannot output sample\n");
 					info->error = YES;
-					[statusField setTextColor:[NSColor redColor]];
-					[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-					[statusField setStringValue:LS(@"Error has occurred in the encoder")];
+					[self updateStatusMessageOnMainThread:LS(@"Error has occurred in the encoder") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor redColor]];
 					[pool2 release];
 					break;
 				}
@@ -989,7 +1003,7 @@ typedef struct {
 				free(tmpbuf);
 			}
 			percent = 100.0*((double)totalFrame-(double)(info->framesToCopy))/(double)totalFrame;
-			[progress setDoubleValue:percent];
+			[self performSelectorOnMainThread:@selector(updateStatus) withObject:nil waitUntilDone:YES];
 			[pool2 release];
 			break;
 		}
@@ -1055,21 +1069,13 @@ finish:
 			}
 		}
 	}
-	[progress removeFromSuperview];
-	[speedField removeFromSuperview];
-	[stopButton removeFromSuperview];
+	[self performSelectorOnMainThread:@selector(cleanupSubviews) withObject:nil waitUntilDone:YES];
 	if(info->error) {
 		[superview setTag:1];
-		/*[statusField setTextColor:[NSColor redColor]];
-		[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-		[statusField setStringValue:LS(@"Error has occurred during the process")];*/
-		[statusField setHidden:NO];
 	}
 	else if(stopConvert) {
 		[superview setTag:0];
-		[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-		[statusField setStringValue:LS(@"Cancelled")];
-		[statusField setHidden:NO];
+		[self updateStatusMessageOnMainThread:LS(@"Cancelled") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:nil];
 	}
 	else {
 #if MAC_OS_X_VERSION_MIN_REQUIRED < 1050
@@ -1160,10 +1166,7 @@ finish:
             }
         }
 		[superview setTag:0];
-		[statusField setTextColor:[NSColor colorWithCalibratedRed:0.25 green:0.35 blue:0.7 alpha:1]];
-		[statusField setFont:[NSFont boldSystemFontOfSize:[[statusField font] pointSize]]];
-		[statusField setStringValue:LS(@"Completed")];
-		[statusField setHidden:NO];
+		[self updateStatusMessageOnMainThread:LS(@"Completed") withFont:[NSFont boldSystemFontOfSize:fontSizeForStatus] andColor:[NSColor colorWithCalibratedRed:0.25 green:0.35 blue:0.7 alpha:1]];
 	}
 	//[self hideProgress];
 	[queue performSelectorOnMainThread:@selector(convertFinished:) withObject:self waitUntilDone:NO];
@@ -1261,14 +1264,8 @@ finish:
 
 - (void)setTrack:(XLDTrack *)t
 {
+	if(track) [track release];
 	track = [t retain];
-	NSMutableString *titleStr = [NSMutableString stringWithString:[track desiredFileName]];
-	NSRange formatIndicatorRange = [titleStr rangeOfString:@"[[[XLD_FORMAT_INDICATOR]]]"];
-	if(formatIndicatorRange.location != NSNotFound) {
-		[titleStr replaceOccurrencesOfString:@"[[[XLD_FORMAT_INDICATOR]]]" withString:LS(@"Multiple Formats") options:0 range:NSMakeRange(0, [titleStr length])];
-	}
-	if(testMode) [nameField setStringValue:[NSString stringWithFormat:@"(Test) %@",titleStr]];
-	else [nameField setStringValue:titleStr];
 }
 
 - (BOOL)isActive
@@ -1386,6 +1383,7 @@ finish:
 
 - (NSView *)progressView
 {
+	[self prepareGUI];
 	return superview;
 }
 

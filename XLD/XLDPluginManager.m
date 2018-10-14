@@ -28,6 +28,16 @@
 		if([fm fileExistsAtPath:bundlePath isDirectory:&isDir] && isDir && [[bundlePath pathExtension] isEqualToString:@"bundle"]) {
 			bundle = [NSBundle bundleWithPath:bundlePath];
 			if(bundle) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+				NSArray *archArray = [bundle executableArchitectures];
+#if defined(__x86_64__)
+				if([archArray indexOfObject:@(NSBundleExecutableArchitectureX86_64)] == NSNotFound) continue;
+#elif defined(__i386__)
+				if([archArray indexOfObject:@(NSBundleExecutableArchitectureI386)] == NSNotFound) continue;
+#elif defined(__ppc__)
+				if([archArray indexOfObject:@(NSBundleExecutableArchitecturePPC)] == NSNotFound) continue;
+#endif
+#endif
 				if(![[bundle infoDictionary] objectForKey:@"NSPrincipalClass"]) continue;
 				[dic setObject:bundlePath forKey:[[bundle infoDictionary] objectForKey:@"NSPrincipalClass"]];
 				//NSLog(@"%@",[[bundle infoDictionary] description]);
@@ -43,6 +53,16 @@
 		if([fm fileExistsAtPath:bundlePath isDirectory:&isDir] && isDir && [[bundlePath pathExtension] isEqualToString:@"bundle"]) {
 			bundle = [NSBundle bundleWithPath:bundlePath];
 			if(bundle) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+				NSArray *archArray = [bundle executableArchitectures];
+#if defined(__x86_64__)
+				if([archArray indexOfObject:@(NSBundleExecutableArchitectureX86_64)] == NSNotFound) continue;
+#elif defined(__i386__)
+				if([archArray indexOfObject:@(NSBundleExecutableArchitectureI386)] == NSNotFound) continue;
+#elif defined(__ppc__)
+				if([archArray indexOfObject:@(NSBundleExecutableArchitecturePPC)] == NSNotFound) continue;
+#endif
+#endif
 				if(![[bundle infoDictionary] objectForKey:@"NSPrincipalClass"]) continue;
 				if([dic objectForKey:[[bundle infoDictionary] objectForKey:@"NSPrincipalClass"]]) continue;
 				[dic setObject:bundlePath forKey:[[bundle infoDictionary] objectForKey:@"NSPrincipalClass"]];

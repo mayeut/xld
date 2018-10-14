@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 			Method toMethod   = class_getInstanceMethod([NSBundle class],@selector(mod_infoDictionary2));
 			method_exchangeImplementations(fromMethod, toMethod);
 			XLDDarkModeSupportEnabled = 1;
+			[pref registerDefaults:@{@"NSLayerPerformanceUpdates": @(YES)}];
 		}
 	}
 #endif

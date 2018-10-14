@@ -298,7 +298,7 @@ int cmdline_main(int argc, char *argv[])
 	int offset = 0;
 	char *cuesheet = NULL;
 	char *trks = NULL;
-	char *outdir = NULL;
+	const char *outdir = NULL;
 	char *ddpms = NULL;
 	const char *outfile = NULL;
 	NSString *extStr = nil;
@@ -313,7 +313,7 @@ int cmdline_main(int argc, char *argv[])
 	id encoder = nil;
 	BOOL acceptStdoutWriting = YES;
 	NSDictionary *profileDic = nil;
-	char infile[512];
+	char *infile;
 	int error = 0;
 	BOOL logcheckerMode = NO;
 	BOOL addMetadata = YES;
@@ -635,21 +635,23 @@ int cmdline_main(int argc, char *argv[])
 		struct stat sb;
 		i = stat(outfile,&sb);
 		if(!i && S_ISDIR(sb.st_mode)) {
-			char *tmp = malloc(1024);
-			outdir = realpath(outfile, tmp);
+			outdir = realpath(outfile, NULL);
 			outfile = NULL;
 		}
 		else {
-			[[NSFileManager defaultManager] createDirectoryWithIntermediateDirectoryInPath:[[NSString stringWithUTF8String:outfile] stringByDeletingLastPathComponent]];
-			char *tmp = malloc(1024);
-			outfile = realpath(outfile, tmp);
+			NSString *standardizedPath = [[NSString stringWithUTF8String:outfile] stringByStandardizingPath];
+			NSString *lastPathComponent = [standardizedPath lastPathComponent];
+			NSString *directoryComponent = [standardizedPath stringByDeletingLastPathComponent];
+			[[NSFileManager defaultManager] createDirectoryWithIntermediateDirectoryInPath:directoryComponent];
+			char *tmp = realpath([directoryComponent UTF8String], NULL);
+			outfile = [[[NSString stringWithUTF8String:tmp] stringByAppendingPathComponent:lastPathComponent] UTF8String];
+			free(tmp);
 		}
 	}
 	if(!outdir) {
-		char *tmp = malloc(1024);
-		outdir = realpath("./", tmp);
+		outdir = realpath("./", NULL);
 	}
-	realpath(argv[optind], infile);
+	infile = realpath(argv[optind], NULL);
 	
 	id decoder;
 	

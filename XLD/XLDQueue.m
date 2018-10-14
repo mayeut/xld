@@ -272,6 +272,7 @@ extern int XLDDarkModeSupportEnabled;
 	}
 	[progressViewArr removeAllObjects];
 	[o_tableView reloadData];
+	lowestActivePosition = 0;
 	selectedRow = -1;
 }
 

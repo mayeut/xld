@@ -104,8 +104,8 @@
 	NSMutableArray *args;
 	if([shell isEqualToString:@"/bin/csh"] || [shell isEqualToString:@"/bin/tcsh"])
 		args = [NSMutableArray arrayWithObjects:@"-i",@"-c",@"/usr/bin/which wine",nil];
-	else if([shell isEqualToString:@"/bin/zsh"])
-		args = [NSMutableArray arrayWithObjects:@"-l",@"-i",@"-c",@"/usr/bin/which wine",nil];
+	/*else if([shell isEqualToString:@"/bin/zsh"] && NSApp)
+		args = [NSMutableArray arrayWithObjects:@"-l",@"-i",@"-c",@"/usr/bin/which wine",nil];*/
 	else
 		args = [NSMutableArray arrayWithObjects:@"-l",@"-c",@"/usr/bin/which wine",nil];
 	[task setArguments:args];
@@ -163,8 +163,8 @@
 	NSMutableArray *args;
 	if([shell isEqualToString:@"/bin/csh"] || [shell isEqualToString:@"/bin/tcsh"])
 		args = [NSMutableArray arrayWithObjects:@"-i",@"-c",@"/usr/bin/which wine",nil];
-	else if([shell isEqualToString:@"/bin/zsh"])
-		args = [NSMutableArray arrayWithObjects:@"-l",@"-i",@"-c",@"/usr/bin/which wine",nil];
+	/*else if([shell isEqualToString:@"/bin/zsh"] && NSApp)
+		args = [NSMutableArray arrayWithObjects:@"-l",@"-i",@"-c",@"/usr/bin/which wine",nil];*/
 	else
 		args = [NSMutableArray arrayWithObjects:@"-l",@"-c",@"/usr/bin/which wine",nil];
 	[tmptask setArguments:args];
